@@ -29,7 +29,7 @@ class VersionSyncChecker:
                 if os.path.exists(p):
                     with open(p, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        header_match = re.search(r'^----\n(.*?)\n----', content, re.DOTALL | re.MULTILINE)
+                        header_match = re.search(r'^---\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
                         if header_match:
                             try:
                                 data = yaml.safe_load(header_match.group(1))
@@ -40,7 +40,7 @@ class VersionSyncChecker:
         
         with open(changelog_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            header_match = re.search(r'^----\n(.*?)\n----', content, re.DOTALL | re.MULTILINE)
+            header_match = re.search(r'^---\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
             if header_match:
                 try:
                     data = yaml.safe_load(header_match.group(1))
@@ -62,7 +62,7 @@ class VersionSyncChecker:
         
         with open(full_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            header_match = re.search(r'^----\n(.*?)\n----', content, re.DOTALL | re.MULTILINE)
+            header_match = re.search(r'^---\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
             if not header_match:
                 return {'status': 'missing_header'}
             
