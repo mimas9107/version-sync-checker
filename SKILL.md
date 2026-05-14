@@ -22,7 +22,7 @@ description: 檢查並同步專案內所有文件的版本號。當使用者要�
 ### 1. 執行檢查腳本
 使用隨附的 Python 腳本進行掃描:
 ```bash
-python3 /home/mimas/.gemini/tmp/mimas/version-sync-checker/scripts/check_version.py [project_root]
+python3 $HOME/.agents/skills/version-sync-checker/scripts/check_version.py [project_root]
 ```
 
 ### 2. 分析檢查結果
