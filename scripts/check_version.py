@@ -2,13 +2,30 @@ import os
 import re
 import yaml
 import json
-from datetime import datetime
 
 class VersionSyncChecker:
     def __init__(self, root_dir='.'):
         self.root_dir = root_dir
         self.mandatory_files = ['README.md', 'CHANGELOG.md', 'SPEC.md', 'MEMOIR.md']
         self.version_pattern = r'(\d+)\.(\d+)\.(\d+)'
+
+    def extract_yaml_front_matter(self, content):
+        if content.startswith('\ufeff'):
+            content = content[1:]
+
+        lines = content.splitlines(keepends=True)
+        if not lines:
+            return None
+
+        if lines[0].strip() != '---':
+            return None
+
+        header_lines = []
+        for line in lines[1:]:
+            if line.strip() == '---':
+                return ''.join(header_lines)
+            header_lines.append(line)
+        return None
 
     def parse_version(self, v_str):
         if not v_str: return None
@@ -29,10 +46,10 @@ class VersionSyncChecker:
                 if os.path.exists(p):
                     with open(p, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        header_match = re.search(r'^---\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
-                        if header_match:
+                        header_content = self.extract_yaml_front_matter(content)
+                        if header_content is not None:
                             try:
-                                data = yaml.safe_load(header_match.group(1))
+                                data = yaml.safe_load(header_content)
                                 v = self.parse_version(data.get('project_version'))
                                 if v: return v
                             except: pass
@@ -40,10 +57,10 @@ class VersionSyncChecker:
         
         with open(changelog_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            header_match = re.search(r'^---\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
-            if header_match:
+            header_content = self.extract_yaml_front_matter(content)
+            if header_content is not None:
                 try:
-                    data = yaml.safe_load(header_match.group(1))
+                    data = yaml.safe_load(header_content)
                     if 'project_version' in data:
                         v = self.parse_version(data['project_version'])
                         if v: return v
@@ -62,12 +79,12 @@ class VersionSyncChecker:
         
         with open(full_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            header_match = re.search(r'^---\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
-            if not header_match:
+            header_content = self.extract_yaml_front_matter(content)
+            if header_content is None:
                 return {'status': 'missing_header'}
             
             try:
-                data = yaml.safe_load(header_match.group(1))
+                data = yaml.safe_load(header_content)
                 current_v = self.parse_version(data.get('project_version', ''))
                 if not current_v:
                     return {'status': 'invalid_version_in_header', 'header': data}

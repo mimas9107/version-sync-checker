@@ -1,3 +1,13 @@
+---
+name: "README.md"
+description: "Version Sync Checker skill overview"
+created_date: "2026/05/15 18:36:37 CST"
+modified_date: "2026/05/15 18:36:37 CST"
+project_version: "0.1.0"
+document_version: "1.0.0"
+agent_sign: ["human/mimas", "codex/gpt-5"]
+---
+
 # Version Sync Checker
 
 自動化執行專案版本號的一致性檢查與同步，確保全專案的文件與程式碼共享單一的事實來源。
