@@ -7,6 +7,9 @@ description: 檢查並同步專案內所有文件的版本號。當使用者要�
 
 此 Skill 用於自動化執行專案版本號的一致性檢查與同步。它以 `CHANGELOG.md` 為「單一事實來源 (Source of Truth)」，並確保全專案的版本標記符合 `$HOME/AGENTS.md` 的規範。
 
+> [!IMPORTANT]
+> **全域共用技能警告**：此技能是跨 Agent 的全域技能（通常透過 Symlink 掛載）。修改此技能的腳本（如 `check_version.py`）將影響所有使用它的 Agent。任何修改都必須確保全域通用性，並在修改後於技能所在的 Git 數據庫中進行 `git commit`。
+
 ## 觸發條件
 - 使用者要求檢查版本一致性。
 - 準備發布新版本或完成 Bug Fix 需要前進版本號。
@@ -33,6 +36,7 @@ python3 $HOME/.agents/skills/version-sync-checker/scripts/check_version.py [proj
     - `version_mismatch`: 版本不符.
     - `missing_header`: 缺少 YAML 標頭.
     - `missing_file`: 文件不存在.
+    - **注意**: 若專案根目錄存在 `VERSION` 檔案，腳本會自動將其納入檢查；若不存在則自動略過，不強制要求。
 
 ### 3. 同步與修正
 若發現不一致，請依照以下優先順序進行修正：
