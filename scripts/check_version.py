@@ -122,6 +122,25 @@ class VersionSyncChecker:
             except:
                 return {'status': 'parse_error'}
 
+    def check_version_file(self, expected_version):
+        path = os.path.join(self.root_dir, 'VERSION')
+        if not os.path.exists(path):
+            return None
+        
+        with open(path, 'r', encoding='utf-8') as f:
+            v_str = f.read().strip()
+            current_v = self.parse_version(v_str)
+            if not current_v:
+                return {'status': 'missing_or_invalid_version'}
+            
+            if current_v != expected_version:
+                return {
+                    'status': 'version_mismatch',
+                    'current': self.format_version(current_v),
+                    'expected': self.format_version(expected_version)
+                }
+            return {'status': 'ok', 'version': self.format_version(current_v)}
+
     def run_check(self):
         sot_v = self.get_sot_version()
         if not sot_v:
@@ -139,6 +158,10 @@ class VersionSyncChecker:
         pkg_res = self.check_package_json(sot_v)
         if pkg_res:
             results["files"]["package.json"] = pkg_res
+            
+        version_file_res = self.check_version_file(sot_v)
+        if version_file_res:
+            results["files"]["VERSION"] = version_file_res
             
         return results
 
